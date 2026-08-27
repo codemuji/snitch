@@ -14,7 +14,7 @@ export const validateRegisterUser = [
   body("contact")
     .notEmpty()
     .withMessage(" Contact is required")
-    .matches(/^\d{10}$/)
+    .isMobilePhone()
     .withMessage("Contact must be a valid 10-digit number"),
   body("password")
     .isLength({ min: 6 })
@@ -28,5 +28,13 @@ export const validateRegisterUser = [
     .optional()
     .isBoolean()
     .withMessage("isSeller must be a boolean"),
+  validateRequest,
+];
+
+export const validateLoginUser = [
+  body("email").isEmail().withMessage("Invalid Email"),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
   validateRequest,
 ];

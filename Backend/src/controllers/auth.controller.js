@@ -2,8 +2,8 @@ import userModal from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 
-async function sendTokenResponse(user, res) {
-  const token = user.sign(
+async function sendTokenResponse(user, res, message) {
+  const token = jwt.sign(
     {
       id: user._id,
     },
@@ -39,10 +39,38 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new userModal({ email, contact, password, fullname, role: isSeller ? "seller" : "buyer" });
+    const user = new userModal({
+      email,
+      contact,
+      password,
+      fullname,
+      role: isSeller ? "seller" : "buyer",
+    });
+
+    await user.save();
 
     await sendTokenResponse(user, res, "User registered successfully");
   } catch (error) {
+    console.error("Register error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await userModal.findOne({ email })
+
+  if(!user){
+    return res.status(400).json({message:"User not found"})
+  }
+
+  const isMatch = await user.comparePassword(password)
+
+  if(!isMatch){
+    return res.status(400).json({message:"Invalid password"})
+  }
+  
+
+  await sendTokenResponse(user, res, "User logged in successfully");
+}
