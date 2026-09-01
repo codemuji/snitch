@@ -61,16 +61,22 @@ export const login = async (req, res) => {
 
   const user = await userModal.findOne({ email })
 
-  if(!user){
-    return res.status(400).json({message:"User not found"})
+  if (!user) {
+    return res.status(400).json({ message: "User not found" })
   }
 
   const isMatch = await user.comparePassword(password)
 
-  if(!isMatch){
-    return res.status(400).json({message:"Invalid password"})
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid password" })
   }
-  
+
 
   await sendTokenResponse(user, res, "User logged in successfully");
+}
+
+export const googleCallback = async (req, res) => {
+  console.log(req.user);
+
+  res.redirect("http://localhost:5173/");
 }
